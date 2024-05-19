@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Chatbot</title>
+    <title>Health Consultation AI Services</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
       body {
@@ -12,18 +12,39 @@
         color: #333;
         margin: 0;
         padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
       }
-      #chat-container {
+      #main-container {
+        display: flex;
+        flex-direction: row;
         width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
-        border: 1px solid #ccc;
+        max-width: 1200px;
+        height: 100%;
+      }
+      .service-container {
+        flex: 1;
+        margin: 10px;
+        padding: 20px;
         background: white;
         border-radius: 8px;
-        padding: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 1px solid #ccc;
+        display: flex;
+        flex-direction: column;
+      }
+      .service-container h2 {
+        text-align: center;
+      }
+      #chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 80%;
       }
       #chat-history {
+        flex: 1;
         height: 300px;
         overflow-y: auto;
         padding: 10px;
@@ -72,27 +93,18 @@
       #send-button:hover {
         background-color: #0056b3;
       }
-  
-      /* New section for NER model */
-      #ner-container {
-        margin-top: 20px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 10px;
-      }
-      #ner-input {
+      #diabetes-container, #ner-container {
         display: flex;
-        align-items: center;
+        flex-direction: column;
       }
-      #ner-input-box {
-        flex: 1;
+      #diabetes-container input, #ner-container input {
+        margin-bottom: 10px;
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 20px;
         outline: none;
       }
-      #ner-button {
-        margin-left: 10px;
+      #predict-button, #ner-button {
         padding: 10px 20px;
         border: none;
         background-color: #28a745;
@@ -100,36 +112,49 @@
         border-radius: 20px;
         cursor: pointer;
       }
-      #ner-button:hover {
+      #predict-button:hover, #ner-button:hover {
         background-color: #218c3d;
       }
-      #ner-results {
+      #diabetes-result {
         margin-top: 10px;
         padding: 10px;
         font-weight: bold;
+        text-align: center;
       }
     </style>
 </head>
 <body>
-    <div id="chat-container">
-        <div id="chat-history">
-            <!-- Chat history will be loaded here -->
+    <div id="main-container">
+        <div class="service-container" id="chat-container">
+            <h2>Chatbot</h2>
+            <div id="chat-history">
+                <!-- Chat history will be loaded here -->
+            </div>
+            <div id="user-input">
+                <input type="text" id="input-box" placeholder="Ask something...">
+                <button id="send-button">Send</button>
+            </div>
         </div>
-        <div id="user-input">
-            <input type="text" id="input-box" placeholder="Enter your message">
-            <button id="send-button">Send</button>
+        <div class="service-container" id="diabetes-container">
+            <h2>Diabetes Prediction</h2>
+            <input type="number" id="pregnancies" placeholder="Pregnancies">
+            <input type="number" id="glucose" placeholder="Glucose Level">
+            <input type="number" id="blood-pressure" placeholder="Blood Pressure">
+            <input type="number" id="skin-thickness" placeholder="Skin Thickness">
+            <input type="number" id="insulin" placeholder="Insulin">
+            <input type="number" id="bmi" placeholder="BMI">
+            <input type="number" id="dpf" placeholder="Diabetes Pedigree Function">
+            <input type="number" id="age" placeholder="Age">
+            <button id="predict-button">Predict</button>
+            <div id="diabetes-result"></div>
+        </div>
+        <div class="service-container" id="ner-container">
+            <h2>Diagnosis Extraction</h2>
+            <input type="text" id="ner-input-box" placeholder="Enter text for extraction">
+            <button id="ner-button">Extract</button>
+            <div id="ner-results"></div>
         </div>
     </div>
-    <div id="ner-container">
-      <h2>NER Analysis</h2>
-      <div id="ner-input">
-      <input type="text" id="ner-input-box" placeholder="Enter text for NER analysis">
-      <button id="ner-button">Analyze</button>
-      </div>
-      <div id="ner-results">
-      </div>
-  </div>
-  </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
@@ -152,30 +177,73 @@
                     }
                 });
             });
-        });
 
-        // New code for handling NER analysis
-  $('#ner-button').click(function() {
-    var nerInput = $('#ner-input-box').val();
+            // Code for handling NER analysis
+            $('#ner-button').click(function() {
+                var nerInput = $('#ner-input-box').val();
 
-    // Send an AJAX request to the /ner route
-    $.ajax({
-      url: '/ner',
-      method: 'POST',
-      data: { text: nerInput },
-      success: function(response) {
-        var nerResults = response.ner_results;
-        // Update the #ner-results element with the NER results
-        $('#ner-results').html(nerResults);
-      }
-    });
+                // Send an AJAX request to the /ner route
+                $.ajax({
+                    url: '/ner',
+                    method: 'POST',
+                    data: { text: nerInput },
+                    success: function(response) {
+                        var nerResults = response.ner_results;
+                        // Update the #ner-results element with the NER results
+                        $('#ner-results').html(nerResults);
+                    }
+                });
 
-    // Clear the NER input field
-    $('#ner-input-box').val('');
-  });
+                // Clear the NER input field
+                $('#ner-input-box').val('');
+            });
 
-        
+            // Code for handling diabetes prediction
+            $('#predict-button').click(function() {
+                // Check if all fields are filled
+                var fieldsFilled = true;
+
+                $('#diabetes-container input').each(function() {
+                    if ($(this).val() === '') {
+                        fieldsFilled = false;
+                        return false; // Exit the loop early
+                    }
+                });
+
+                if (!fieldsFilled) {
+                    // Display a message or handle the case where not all fields are filled
+                    alert('Please fill in all fields before predicting.');
+                    return; // Exit the function early
+                }
+
+                // If all fields are filled, proceed with prediction
+                var data = {
+                    pregnancies: $('#pregnancies').val(),
+                    glucose: $('#glucose').val(),
+                    bloodPressure: $('#blood-pressure').val(),
+                    skinthickness: $('#skin-thickness').val(),
+                    insulin: $('#insulin').val(),
+                    bmi: $('#bmi').val(),
+                    DiabetesPedigreeFunction: $('#dpf').val(),
+                    age: $('#age').val()
+                };
+
+                $.ajax({
+                    url: '/predict_diabetes',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        var prediction = response.prediction;
+                        // Update the #diabetes-result element with the prediction
+                        $('#diabetes-result').html('Diabetes Risk: ' + prediction);
+                    }
+                });
+
+                // Clear the input fields
+                $('#diabetes-container input').val('');
+            })
+          });
     </script>
 </body>
 </html>
-

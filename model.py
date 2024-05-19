@@ -1,13 +1,14 @@
 import requests
 API_URL = "https://api-inference.huggingface.co/models/Riftkey/NER-Disease"
-headers = {"Authorization": f"Bearer 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"}
+API_TOKEN ="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"
+headers = {"Authorization": f"Bearer {API_TOKEN}"}
 def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
     return response.json()
-data = query("influenza cancer tumor ")
+# data = query("influenza cancer tumor ")
 
 
-
+# sample text = "terdapat gejala bersin dan batuk, kemungkinan paseins sedang mengalami flu. selain itu terdapat cairan di dalam paru-paru kemungkinan pneumonia"
 def diagnosis(text):
 
   """
@@ -24,13 +25,13 @@ def diagnosis(text):
   print(result)
   diagnoses = set() 
   for entity in result:
-    if entity['word'][0] == "#":  # Exclude special tokens
-      # Extract only the disease name after removing hashtag and following characters
-      if entity['word'].startswith("##"):
-        print(entity['word'])
+    # if entity['word'][0] == "#":  # Exclude special tokens
+    # Extract only the disease name after removing hashtag and following characters
+    if entity['word'].startswith("##"):
+        # print(entity['word'])
         disease_name = entity['word'].split()[1]  # Get the word after the space
-        print(disease_name)
-      else:
+        # print(disease_name)
+    else:
         disease_name = entity['word']
     diagnoses.add(disease_name)
 
